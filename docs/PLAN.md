@@ -1,5 +1,9 @@
 # PLAN — Recetario «Socarrat» (web de recetas con modo cocina)
 
+## Ampliación del 18 de octubre de 2026
+
+Por petición del usuario, la portada incluye ahora arroz con bogavante, cocido madrileño, paella valenciana y fabada asturiana, además de un buscador por nombre o ingrediente que ignora mayúsculas y tildes. Esta ampliación sustituye la limitación original de una receta y la exclusión del buscador. Las nuevas vistas conservan las rutas por hash, las ilustraciones SVG, el diseño oscuro, el escalado, el PDF, el horario secuencial y el modo cocina compartido. El remojo de las legumbres se indica como preparación del día anterior fuera del horario; la comprobación de ternura requiere confirmación manual.
+
 Plan autosuficiente para un agente programador. Ejecutar al pie de la letra. Todo el texto visible en español de España.
 
 ---

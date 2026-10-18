@@ -71,7 +71,17 @@
       '</svg>';
   }
 
-  const ILUSTRACIONES = { bogavante: svgBogavante };
+  function svgGuiso(tipo, extra) {
+    const paella = tipo === 'paella';
+    let ingredientes = '';
+    for (let i = 0; i < 24; i++) {
+      const angulo = i * 2.4, radio = 12 + Math.sqrt(i / 24) * 54;
+      const x = 100 + Math.cos(angulo) * radio, y = 105 + Math.sin(angulo) * radio * .52;
+      ingredientes += '<ellipse cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" rx="' + (paella ? 5 : 7) + '" ry="4" fill="' + (paella ? '#FFD27A' : tipo === 'fabada' ? '#EEE0B9' : '#E4BA70') + '"/>';
+    }
+    return '<svg viewBox="0 0 200 200" ' + (extra || '') + ' aria-hidden="true"><path d="M28 106H10V125H32M172 106H190V125H168" fill="none" stroke="#A9BFC8" stroke-width="7" stroke-linejoin="round"/><path d="M28 104Q28 169 100 170Q172 169 172 104" fill="#1C1917" stroke="#3A332E" stroke-width="4"/><ellipse cx="100" cy="104" rx="73" ry="43" fill="' + (paella ? '#9D641D' : '#98512D') + '" stroke="#3A332E" stroke-width="5"/>' + ingredientes + '<path d="M64 90l20 10M115 119l22-12" stroke="' + (paella ? '#A7B84A' : '#E2492F') + '" stroke-width="12" stroke-linecap="round"/><g class="vapor"><path d="M70 57Q58 45 70 30"/><path d="M100 52Q88 40 100 25"/><path d="M130 57Q118 45 130 30"/></g></svg>';
+  }
+  const ILUSTRACIONES = { bogavante: svgBogavante, cocido: (extra) => svgGuiso('cocido', extra), paella: (extra) => svgGuiso('paella', extra), fabada: (extra) => svgGuiso('fabada', extra) };
   function ilustracion(clave, extra) { return (ILUSTRACIONES[clave] || svgBogavante)(extra); }
 
   // ---------- 7.2 Router ----------
@@ -107,13 +117,28 @@
       '<div class="vista contenedor">' +
         '<header class="heroe">' + svgHeroe() +
           '<h1 class="titulo-marca subir" style="--i:1">Socarrat</h1>' +
-          '<p class="lema subir" style="--i:2">Arroces de los de antes, con horas, paso a paso y en voz alta.</p>' +
+          '<p class="lema subir" style="--i:2">Recetas de las de antes, con horas, paso a paso y en voz alta.</p>' +
         '</header>' +
-        '<div class="rejilla">' + tarjetas +
-          '<div class="tarjeta tarjeta-fantasma subir" style="--i:' + (3 + RECETAS.length) + '" aria-hidden="true"><h2>Más recetas pronto</h2></div>' +
-        '</div>' +
+        '<section class="buscador" aria-label="Buscar recetas"><label for="buscar-receta">¿Qué te apetece cocinar?</label><input id="buscar-receta" type="search" placeholder="Busca por receta o ingrediente" aria-controls="lista-recetas" autocomplete="off"><p id="resultados-recetas" role="status" aria-live="polite"></p></section>' +
+        '<div id="lista-recetas" class="rejilla">' + tarjetas + '</div>' +
+        '<p id="sin-resultados" class="sin-resultados" hidden>No hay recetas con esa búsqueda. Prueba con otro nombre o ingrediente.</p>' +
         '<footer class="pie">Socarrat · recetario</footer>' +
       '</div>';
+    const normalizar = (texto) => texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    const tarjetasDOM = $('lista-recetas').querySelectorAll('a');
+    const textos = RECETAS.map((r) => normalizar([r.nombre, r.subtitulo].concat(r.ingredientes.map((i) => i.nombre)).join(' ')));
+    function buscar() {
+      const palabras = normalizar($('buscar-receta').value).trim().split(/\s+/).filter(Boolean);
+      let cantidad = 0;
+      tarjetasDOM.forEach((tarjeta, i) => {
+        tarjeta.hidden = !palabras.every((p) => textos[i].includes(p));
+        if (!tarjeta.hidden) cantidad++;
+      });
+      $('resultados-recetas').textContent = cantidad + (cantidad === 1 ? ' receta' : ' recetas');
+      $('sin-resultados').hidden = cantidad > 0;
+    }
+    $('buscar-receta').addEventListener('input', buscar);
+    buscar();
   }
 
   // ---------- 7.4 Receta ----------
