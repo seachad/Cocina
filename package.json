@@ -1,0 +1,3 @@
+{ "name":"socarrat", "private":true,
+  "scripts": { "check":"node --check recetas.js && node --check nucleo.js && node --check app.js",
+               "test":"node --test tests/nucleo.test.js tests/recetas.test.js tests/cocina.test.js" } }
